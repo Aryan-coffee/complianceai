@@ -182,7 +182,7 @@ export default function DashboardPage() {
       <div style={{ maxWidth:1300, margin:"0 auto", padding:"6rem 2rem 2rem", position:"relative", zIndex:1 }}>
 
         {/* HEADER */}
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", opacity:visible?1:0, animation:visible?"fadeUp 0.6s ease":"none" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1.5rem", flexWrap:"wrap", gap:"1rem", opacity:visible?1:0, animation:visible?"fadeUp 0.6s ease":"none" }}>
           <div>
             <div style={{ fontSize:12, color:"#4F8EF7", fontWeight:600, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:6 }}>Welcome back</div>
             <h1 style={{ fontSize:"2rem", fontWeight:800, letterSpacing:"-0.02em", background:"linear-gradient(135deg,#fff,#94A3B8)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{user.full_name}</h1>
@@ -213,7 +213,7 @@ export default function DashboardPage() {
 
         {/* STAT CARDS */}
         {stats && (
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"1rem", marginBottom:"2rem" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:"1rem", marginBottom:"2rem" }}>
             {[
               { label:"Total Checks", value:stats.total_checks, color:"#4F8EF7", icon:"🔍", delay:0.2 },
               { label:"Average Score", value:stats.avg_score, color:stats.avg_score>70?"#22C55E":stats.avg_score>40?"#F59E0B":"#EF4444", icon:"📊", suffix:"/100", delay:0.3 },
@@ -240,7 +240,7 @@ export default function DashboardPage() {
         )}
 
         {/* MAIN GRID */}
-        <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr", gap:"1.5rem", marginBottom:"2rem" }}>
+        <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr)", gap:"1.5rem", marginBottom:"2rem" }}>
 
           {/* LEFT — RECENT CHECKS */}
           <div style={{ background:"rgba(17,34,64,0.8)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:18, padding:"1.5rem", backdropFilter:"blur(10px)", opacity:visible?1:0, animation:visible?"fadeUp 0.6s ease 0.6s both":"none" }}>
@@ -325,7 +325,7 @@ export default function DashboardPage() {
         {/* QUICK ACTIONS */}
         <div style={{ opacity:visible?1:0, animation:visible?"fadeUp 0.6s ease 1s both":"none" }}>
           <h2 style={{ fontSize:"1rem", fontWeight:700, marginBottom:"1rem", color:"#94A3B8", textTransform:"uppercase", letterSpacing:"0.08em" }}>Quick Actions</h2>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:10 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(100px,1fr))", gap:10 }}>
             {QUICK_ACTIONS.map((a: any, i: number) => (
               <Link key={a.href} href={a.href} className="qa-card" style={{ background:"rgba(17,34,64,0.8)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:14, padding:"1.25rem 1rem", textDecoration:"none", textAlign:"center", transition:"all 0.3s", opacity:visible?1:0, animation:visible?`fadeUp 0.5s ease ${1.1+i*0.05}s both`:"none", backdropFilter:"blur(10px)" }}>
                 <div style={{ fontSize:28, marginBottom:"0.75rem" }}>{a.icon}</div>
