@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
 import { complianceAPI } from "@/lib/api"
+import api from "@/lib/api"
 import Navbar from "@/components/Navbar"
 import toast from "react-hot-toast"
 import Link from "next/link"
@@ -34,8 +35,23 @@ export default function CompliancePage() {
     setStep("loading")
     try {
       const res = await complianceAPI.check(form)
-      setResults(res.data); setCheckId(res.data.check_id); setStep("results"); toast.success("Analysis complete!")
+      setResults(res.data); setCheckId(res.data.check_id || ''); setStep("results"); toast.success("Analysis complete!")
     } catch (err: any) { toast.error(err.response?.data?.detail||"Analysis failed"); setStep("form") }
+  }
+
+  const downloadCertificate = async () => {
+    if (!checkId) { toast.error("No check found"); return }
+    try {
+      const cleanId = checkId.toString().trim()
+      const res = await api.get(`/compliance/checks/${cleanId}/certificate`, { responseType: "blob" })
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }))
+      const a = document.createElement("a"); a.href=url; a.download=`compliance_certificate_${cleanId.slice(0,8)}.pdf`; a.click()
+      window.URL.revokeObjectURL(url)
+      toast.success("Certificate downloaded!")
+    } catch (err: any) { 
+      console.error("Certificate error:", err)
+      toast.error("Certificate failed: " + (err.response?.data?.detail || err.message)) 
+    }
   }
 
   const downloadPDF = async () => {
@@ -138,6 +154,10 @@ export default function CompliancePage() {
               </div>
               <div style={{ display:"flex", gap:10, flexDirection:"column" }}>
                 <button onClick={downloadPDF} disabled={pdfLoading} style={{ padding:"12px 20px", borderRadius:10, border:"none", cursor:"pointer", fontSize:13, fontWeight:600, background:"linear-gradient(135deg,#4F8EF7,#7C3AED)", color:"#fff", whiteSpace:"nowrap" }}>{pdfLoading?"Generating...":"Download PDF"}</button>
+                <div style={{ display:"flex", gap:8, flexDirection:"column" }}>
+                    <button onClick={downloadPDF} disabled={pdfLoading} style={{ padding:"10px 16px", borderRadius:10, border:"none", cursor:"pointer", fontSize:13, fontWeight:600, background:"linear-gradient(135deg,#4F8EF7,#7C3AED)", color:"#fff", whiteSpace:"nowrap" }}>{pdfLoading?"Generating...":"Download PDF Report"}</button>
+                    <button onClick={downloadCertificate} style={{ padding:"10px 16px", borderRadius:10, border:"1px solid #22C55E", background:"rgba(34,197,94,0.08)", color:"#22C55E", cursor:"pointer", fontSize:13, fontWeight:500, whiteSpace:"nowrap" }}>Download Certificate</button>
+                  </div>
                 <Link href={"/chat?check_id="+checkId} style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", color:"#94A3B8", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"10px 16px", fontSize:13, background:"rgba(0,0,0,0.2)" }}>Ask AI about this</Link>
               </div>
             </div>
