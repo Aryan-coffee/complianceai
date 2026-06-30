@@ -56,7 +56,43 @@ def get_html(otp, purpose_text):
 </table>
 </body></html>"""
 
+
+def _send_via_sendgrid(email, otp, purpose):
+    try:
+        import httpx
+        api_key = os.getenv("SENDGRID_API_KEY", "")
+        if not api_key:
+            return False
+        purpose_text = "login" if purpose == "login" else ("create your account" if purpose == "register" else "reset your password")
+        subject_map = {"login":"Your ComplianceAI verification code","register":"Confirm your ComplianceAI account","reset":"ComplianceAI password reset request"}
+        subject = subject_map.get(purpose, "Your ComplianceAI OTP Code")
+        sender_email = os.getenv("SMTP_USER", "dhiman230703@gmail.com")
+        payload = {
+            "personalizations": [{"to": [{"email": email}]}],
+            "from": {"email": sender_email, "name": "ComplianceAI"},
+            "subject": subject,
+            "content": [{"type": "text/html", "value": get_html(otp, purpose_text)}]
+        }
+        response = httpx.post(
+            "https://api.sendgrid.com/v3/mail/send",
+            json=payload,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            timeout=30
+        )
+        print(f"[SendGrid Response] Status: {response.status_code}")
+        if response.status_code in [200, 201, 202]:
+            print(f"[EMAIL SENT via SendGrid] {email}")
+            return True
+        else:
+            print(f"[SendGrid ERROR] {response.text}")
+            return False
+    except Exception as e:
+        print(f"[SendGrid EXCEPTION] {e}")
+        return False
+
 def send_otp_email(email: str, otp: str, purpose: str = "login") -> bool:
+    if _send_via_sendgrid(email, otp, purpose):
+        return True
     import httpx
     api_key = os.getenv("BREVO_API_KEY", "")
     print(f"[EMAIL DEBUG] Sending to {email}, BREVO_API_KEY exists: {bool(api_key)}")
