@@ -1,0 +1,57 @@
+﻿from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.colors import HexColor, white
+from reportlab.pdfgen import canvas as pdfcanvas
+from datetime import datetime
+import io
+
+def generate_certificate(ai_system_name, company_name, overall_score, overall_status, countries, check_id):
+    buffer = io.BytesIO()
+    W, H = landscape(A4)
+    c = pdfcanvas.Canvas(buffer, pagesize=landscape(A4))
+    NAVY=HexColor("#0A1628"); ACCENT=HexColor("#4F8EF7"); PURPLE=HexColor("#7C3AED")
+    SUCCESS=HexColor("#22C55E"); GOLD=HexColor("#F59E0B"); DANGER=HexColor("#EF4444")
+    sc_color = SUCCESS if overall_score > 70 else (GOLD if overall_score > 40 else DANGER)
+    status_color = SUCCESS if overall_status == "Compliant" else (GOLD if "Partial" in overall_status else DANGER)
+    c.setFillColor(NAVY); c.rect(0,0,W,H,fill=1,stroke=0)
+    c.setStrokeColor(ACCENT); c.setLineWidth(3); c.rect(20,20,W-40,H-40,fill=0,stroke=1)
+    c.setStrokeColor(PURPLE); c.setLineWidth(1); c.rect(28,28,W-56,H-56,fill=0,stroke=1)
+    for x,y in [(20,20),(W-20,20),(20,H-20),(W-20,H-20)]:
+        c.setFillColor(ACCENT); c.circle(x,y,6,fill=1,stroke=0)
+    c.setFillColor(ACCENT); c.rect(28,H-90,(W-56)*0.6,4,fill=1,stroke=0)
+    c.setFillColor(PURPLE); c.rect(28+(W-56)*0.6,H-90,(W-56)*0.4,4,fill=1,stroke=0)
+    c.setFillColor(ACCENT); c.roundRect(W/2-35,H-115,70,45,8,fill=1,stroke=0)
+    c.setFillColor(white); c.setFont("Helvetica-Bold",18); c.drawCentredString(W/2,H-98,"CA")
+    c.setFillColor(white); c.setFont("Helvetica-Bold",16); c.drawCentredString(W/2,H-135,"ComplianceAI")
+    c.setFillColor(HexColor("#94A3B8")); c.setFont("Helvetica",10); c.drawCentredString(W/2,H-152,"Global AI Governance Platform")
+    c.setStrokeColor(HexColor("#1E3A5F")); c.setLineWidth(1); c.line(80,H-168,W-80,H-168)
+    c.setFillColor(HexColor("#94A3B8")); c.setFont("Helvetica",12); c.drawCentredString(W/2,H-195,"CERTIFICATE OF AI COMPLIANCE ASSESSMENT")
+    c.setFillColor(GOLD)
+    for offset in [-180,-90,0,90,180]:
+        c.setFont("Helvetica",14); c.drawCentredString(W/2+offset,H-215,"*")
+    c.setFillColor(HexColor("#64748B")); c.setFont("Helvetica",13)
+    c.drawCentredString(W/2,H-245,"This certifies that the following AI system has been assessed for")
+    c.drawCentredString(W/2,H-263,"regulatory compliance by ComplianceAI")
+    c.setFillColor(white); c.setFont("Helvetica-Bold",38); c.drawCentredString(W/2,H-315,ai_system_name)
+    name_width = c.stringWidth(ai_system_name,"Helvetica-Bold",38)
+    c.setStrokeColor(ACCENT); c.setLineWidth(2); c.line(W/2-name_width/2,H-322,W/2+name_width/2,H-322)
+    if company_name:
+        c.setFillColor(HexColor("#94A3B8")); c.setFont("Helvetica",14); c.drawCentredString(W/2,H-345,f"by {company_name}")
+    c.setFillColor(HexColor("#64748B")); c.setFont("Helvetica",12); c.drawCentredString(W/2,H-375,"across the following regulatory frameworks:")
+    c.setFillColor(ACCENT); c.setFont("Helvetica-Bold",13); c.drawCentredString(W/2,H-395," | ".join(countries))
+    c.setFillColor(HexColor("#0A1628")); c.roundRect(W/2-75,H-475,150,90,10,fill=1,stroke=0)
+    c.setStrokeColor(sc_color); c.setLineWidth(2); c.roundRect(W/2-75,H-475,150,90,10,fill=0,stroke=1)
+    c.setFillColor(sc_color); c.setFont("Helvetica-Bold",44); c.drawCentredString(W/2,H-442,str(overall_score))
+    c.setFont("Helvetica",10); c.drawCentredString(W/2,H-460,"COMPLIANCE SCORE / 100")
+    c.setFillColor(status_color); c.setFont("Helvetica-Bold",18); c.drawCentredString(W/2,H-498,overall_status.upper())
+    c.setStrokeColor(HexColor("#334155")); c.setLineWidth(1); c.line(80,H-555,W-80,H-555)
+    c.setFillColor(HexColor("#64748B")); c.setFont("Helvetica",9)
+    c.drawCentredString(W/2,H-575,f"Certificate ID: {check_id[:16].upper()}   |   Issued: {datetime.now().strftime('%B %d, %Y')}   |   Valid for 90 days")
+    c.drawCentredString(W/2,H-592,"Assessed using AI-powered regulatory analysis. Not a substitute for legal advice.")
+    c.setFillColor(HexColor("#0F1E3A")); c.circle(W-100,80,45,fill=1,stroke=0)
+    c.setStrokeColor(GOLD); c.setLineWidth(2); c.circle(W-100,80,45,fill=0,stroke=1); c.circle(W-100,80,38,fill=0,stroke=1)
+    c.setFillColor(GOLD); c.setFont("Helvetica-Bold",7); c.drawCentredString(W-100,88,"COMPLIANCE"); c.drawCentredString(W-100,78,"VERIFIED"); c.setFont("Helvetica",6); c.drawCentredString(W-100,68,str(datetime.now().year))
+    c.setFillColor(HexColor("#0F1E3A")); c.circle(100,80,45,fill=1,stroke=0)
+    c.setStrokeColor(ACCENT); c.setLineWidth(2); c.circle(100,80,45,fill=0,stroke=1); c.circle(100,80,38,fill=0,stroke=1)
+    c.setFillColor(ACCENT); c.setFont("Helvetica-Bold",8); c.drawCentredString(100,88,"ComplianceAI"); c.setFont("Helvetica",6); c.drawCentredString(100,78,"CERTIFIED"); c.drawCentredString(100,68,"ASSESSMENT")
+    c.showPage(); c.save(); buffer.seek(0)
+    return buffer.read()
