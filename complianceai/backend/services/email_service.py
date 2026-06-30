@@ -26,28 +26,29 @@ def verify_otp(email: str, otp: str, purpose: str = "login") -> bool:
 
 def get_html(otp, purpose_text):
     return f"""<!DOCTYPE html>
-<html><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f1f5f9;">
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 0;">
   <tr><td align="center">
-    <table width="520" cellpadding="0" cellspacing="0" style="background:#0A1628;border-radius:16px;overflow:hidden;font-family:Arial,sans-serif;">
+    <table width="500" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
       <tr>
-        <td style="background:linear-gradient(135deg,#4F8EF7,#7C3AED);padding:32px;text-align:center;">
-          <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;">ComplianceAI</h1>
-          <p style="color:rgba(255,255,255,0.7);margin:6px 0 0;font-size:13px;">Global AI Governance Platform</p>
+        <td style="background:#1a2744;padding:28px;text-align:center;">
+          <h1 style="color:#ffffff;margin:0;font-size:20px;font-weight:700;">ComplianceAI</h1>
         </td>
       </tr>
       <tr>
-        <td style="padding:32px;background:#112240;">
-          <h2 style="color:#fff;font-size:18px;margin:0 0 8px;">Your verification code</h2>
-          <p style="color:#94A3B8;font-size:14px;margin:0 0 24px;">Use this OTP to {purpose_text}. Expires in 10 minutes.</p>
-          <div style="background:#0A1628;border:2px solid #4F8EF7;border-radius:12px;padding:24px;text-align:center;margin:0 0 24px;">
-            <span style="font-size:40px;font-weight:700;letter-spacing:8px;color:#4F8EF7;font-family:monospace;">{otp}</span>
-          </div>
-          <p style="color:#475569;font-size:11px;text-align:center;margin:0;">
-            If you did not request this, ignore this email.
-            Copyright 2024 ComplianceAI
-          </p>
+        <td style="padding:32px;background:#ffffff;">
+          <p style="color:#1e293b;font-size:15px;margin:0 0 16px;">Hello,</p>
+          <p style="color:#475569;font-size:14px;margin:0 0 24px;line-height:1.6;">Please use the verification code below to {purpose_text} on ComplianceAI.</p>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td align="center" style="padding:20px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+              <span style="font-size:32px;font-weight:700;letter-spacing:6px;color:#1a2744;font-family:monospace;">{otp}</span>
+            </td></tr>
+          </table>
+          <p style="color:#94a3b8;font-size:12px;margin:20px 0 0;text-align:center;">This code will expire in 10 minutes.</p>
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;">
+          <p style="color:#94a3b8;font-size:11px;margin:0;text-align:center;">If you did not request this code, you can safely ignore this email.</p>
+          <p style="color:#cbd5e1;font-size:10px;margin:16px 0 0;text-align:center;">ComplianceAI, Noida, Uttar Pradesh, India</p>
         </td>
       </tr>
     </table>
@@ -63,7 +64,7 @@ def send_otp_email(email: str, otp: str, purpose: str = "login") -> bool:
         print(f"[DEV OTP] {email} => {otp}")
         return True
     purpose_text = "login" if purpose == "login" else ("create your account" if purpose == "register" else "reset your password")
-    subject_map = {"login":"Your ComplianceAI Login Code","register":"Verify Your ComplianceAI Account","reset":"Reset Your ComplianceAI Password"}
+    subject_map = {"login":"Your ComplianceAI verification code","register":"Confirm your ComplianceAI account","reset":"ComplianceAI password reset request"}
     subject = subject_map.get(purpose, "Your ComplianceAI OTP Code")
     sender_email = os.getenv("SMTP_USER", "dhiman230703@gmail.com")
     try:
